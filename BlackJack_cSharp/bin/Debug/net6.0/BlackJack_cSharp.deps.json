@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "BlackJack_cSharp/1.0.0": {
+        "runtime": {
+          "BlackJack_cSharp.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "BlackJack_cSharp/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

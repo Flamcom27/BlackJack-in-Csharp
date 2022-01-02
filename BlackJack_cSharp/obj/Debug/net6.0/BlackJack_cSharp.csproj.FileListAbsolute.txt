@@ -1,0 +1,15 @@
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\bin\Debug\net6.0\BlackJack_cSharp.exe
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\bin\Debug\net6.0\BlackJack_cSharp.deps.json
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\bin\Debug\net6.0\BlackJack_cSharp.runtimeconfig.json
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\bin\Debug\net6.0\BlackJack_cSharp.dll
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\bin\Debug\net6.0\ref\BlackJack_cSharp.dll
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\bin\Debug\net6.0\BlackJack_cSharp.pdb
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\obj\Debug\net6.0\BlackJack_cSharp.csproj.AssemblyReference.cache
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\obj\Debug\net6.0\BlackJack_cSharp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\obj\Debug\net6.0\BlackJack_cSharp.AssemblyInfoInputs.cache
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\obj\Debug\net6.0\BlackJack_cSharp.AssemblyInfo.cs
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\obj\Debug\net6.0\BlackJack_cSharp.csproj.CoreCompileInputs.cache
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\obj\Debug\net6.0\BlackJack_cSharp.dll
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\obj\Debug\net6.0\ref\BlackJack_cSharp.dll
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\obj\Debug\net6.0\BlackJack_cSharp.pdb
+C:\Users\test1\source\repos\BlackJack_cSharp\BlackJack_cSharp\obj\Debug\net6.0\BlackJack_cSharp.genruntimeconfig.cache
