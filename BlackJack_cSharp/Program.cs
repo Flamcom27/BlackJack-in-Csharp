@@ -32,16 +32,27 @@ namespace BlackJack_cSharp
      }
     public class Program
     {
-        public static void Main(string[] args)
+        public static List<Card> GenerateDeck()
         {
-            var a = new Card(2, "Clubs");
-            var b = new Card('A', "Clubs");
-            var c = new Card('K', "Clubs");
-            foreach (var i in b.rank)
+            var values = new List<dynamic>() { 2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A' };
+            var suits = new List<string>() { "clubs", "hearts", "spades", "diamonds" };
+            var deck = new List<Card>();
+            foreach (var i in suits)
             {
-                Console.WriteLine($" rank: {i}");
+                foreach (var j in values)
+                {
+                    deck.Add(new Card(j, i));
+                }
             }
-
+            return deck;
+        }
+        public static void Main(string[] args)
+        {   
+            var deck = GenerateDeck();
+            foreach (var card in deck)
+            {
+                Console.Write($"{card} ");
+            }
         }
     }
 }
