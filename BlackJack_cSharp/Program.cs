@@ -4,6 +4,46 @@ using System.Linq;
 
 namespace BlackJack_cSharp 
 {
+    abstract class AbstractPlayer
+    {
+        public abstract int Bet{ get; set;}
+        public abstract void TakeCard();
+        public abstract void Stand();
+        public abstract void Win();
+        public abstract void Loose();
+    }
+    public class Player : AbstractPlayer
+    {
+        public Card[] hand;
+        public string name;
+        public int bank;
+        public int sum;
+        private int bet;
+        public Player()
+        {
+            Console.WriteLine("insert your name");
+            name = Console.ReadLine();
+            bank = 1000;
+        }
+        public override int Bet
+        {
+            get { return bet; }
+            set 
+            { 
+                if (value > bank)
+                {
+                    while (value > bank)
+                    {
+                        Console.WriteLine("your bet is bigger than your bank, please, try again");
+                        value = Convert.ToInt32(Console.ReadLine());
+                    }
+                    bet = value;
+                }
+                else { bet = value; }
+            }
+        }
+
+    }
     public class Card
     {
         public dynamic rank;
@@ -49,10 +89,6 @@ namespace BlackJack_cSharp
         public static void Main(string[] args)
         {   
             var deck = GenerateDeck();
-            foreach (var card in deck)
-            {
-                Console.Write($"{card} ");
-            }
         }
     }
 }
