@@ -16,13 +16,14 @@ namespace BlackJack_cSharp
         public List<Card> hand = new List<Card>();
         public string name;
         public int bank;
-        public int sum;
         private int bet;
+        private List<int> sum;
         public Player()
         {
             Console.WriteLine("insert your name");
             name = Console.ReadLine();
             bank = 1000;
+            sum = new List<int> { 0, 0 };
         }
         public override int Bet
         {
@@ -39,21 +40,18 @@ namespace BlackJack_cSharp
                 }
                 bet = value;
                 bank -= bet;
-                Globals.table += bet * 2;
-                Console.WriteLine($"your bet: {bet}, your bank: {bank}");
+                Globals.table += bet;
             }
         }
+        public List<int> Sum {  get { return sum; } set { sum = value; } }
         public override void TakeCard()
         {
             var cardAt = Globals.random.Next(Globals.deck.Count);
             var card = Globals.deck[cardAt];
             hand.Add(card);
+            CountSum(card);
             Globals.deck.RemoveAt(cardAt);
-            Console.Write("You have: ");
-            foreach (Card i in hand)
-            {
-                Console.Write($"{i} ");
-            }
+            Console.WriteLine($"{name} took a card: {card} ");
         }
         public override void Win()
         {
@@ -61,13 +59,39 @@ namespace BlackJack_cSharp
             bet = 0;
             Globals.table = 0;
             hand.RemoveAll(item => item is Card);
-            Console.WriteLine($"You win! your bank: {bank}");
+            Console.WriteLine($"{name} win!");
         }
         public override void Loose()
         {
             bet = 0;
             hand.RemoveAll(item => item is Card);
-            Console.WriteLine($"You loose! your bank: {bank}");
+            Console.WriteLine($"{name} loose!");
+        }
+        public void CountSum(Card card)
+        {
+            sum[0] += card.rank;
+            if ((card.rank == 1) && (sum[0] + 11 < 21)) 
+            { 
+                sum[1] += 11;
+                Console.WriteLine($"sum of {name}: {sum[0]} or {sum[1]}");
+            }
+            else 
+            { 
+                sum[1] += card.rank;
+                Console.WriteLine($"sum of {name}: {sum[0]}");
+            }
+        }
+    }
+    public class Dealer : Player
+    {
+        public List<Card> hand = new List<Card>();
+        public string name;
+        public double bank = double.PositiveInfinity;
+        private int bet;
+
+        public Dealer()
+        {
+            name = "Dealer";
         }
 
     }
@@ -82,7 +106,7 @@ namespace BlackJack_cSharp
             Name = rank;
             if (rank is char)
             {
-                if (rank == 'A') { this.rank = new List<int>() { 1, 11 }; }
+                if (rank == 'A') { this.rank =  1; }
                 else { this.rank = 10; }
             }
             else { this.rank = rank; }
@@ -102,7 +126,6 @@ namespace BlackJack_cSharp
         public static List<Card> deck;
         public static Random random;
         public static int table;
-        public static Player player;
     }
     public class Program
     {
@@ -120,30 +143,22 @@ namespace BlackJack_cSharp
             }
             return deck;
         }
+        public static void Compare(Player player, Dealer dealer)
+        {
+            
+
+        }
         public static void Main(string[] args)
         {   
             Globals.deck = GenerateDeck();
             Globals.random = new Random();
-            Globals.player = new Player();
-            while (true)
+            var player = new Player();
+            int i = 0;
+            while (Globals.deck.Count != 0)
             {
-                var i = Console.ReadLine();
-                switch (i)
-                {
-                    case "1":
-                        Console.WriteLine("insert your bet: ");
-                        Globals.player.Bet = Convert.ToInt32(Console.ReadLine());
-                        continue;
-                    case "2":
-                        Globals.player.TakeCard();
-                        continue;
-                    case "3":
-                        Globals.player.Win();
-                        continue;
-                    case "4":
-                        Globals.player.Loose();
-                        continue;
-                }
+                player.TakeCard();
+                i++;
+                Console.WriteLine(i);
             }
         }
     }
