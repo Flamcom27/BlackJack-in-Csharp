@@ -4,17 +4,16 @@ using System.Linq;
 
 namespace BlackJack_cSharp 
 {
-    abstract class AbstractPlayer
+    public abstract class AbstractPlayer
     {
         public abstract int Bet{ get; set;}
         public abstract void TakeCard();
-        public abstract void Stand();
         public abstract void Win();
         public abstract void Loose();
     }
     public class Player : AbstractPlayer
     {
-        public Card[] hand;
+        public List<Card> hand = new List<Card>();
         public string name;
         public int bank;
         public int sum;
@@ -37,10 +36,38 @@ namespace BlackJack_cSharp
                         Console.WriteLine("your bet is bigger than your bank, please, try again");
                         value = Convert.ToInt32(Console.ReadLine());
                     }
-                    bet = value;
                 }
-                else { bet = value; }
+                bet = value;
+                bank -= bet;
+                Globals.table += bet * 2;
+                Console.WriteLine($"your bet: {bet}, your bank: {bank}");
             }
+        }
+        public override void TakeCard()
+        {
+            var cardAt = Globals.random.Next(Globals.deck.Count);
+            var card = Globals.deck[cardAt];
+            hand.Add(card);
+            Globals.deck.RemoveAt(cardAt);
+            Console.Write("You have: ");
+            foreach (Card i in hand)
+            {
+                Console.Write($"{i} ");
+            }
+        }
+        public override void Win()
+        {
+            bank += Globals.table;
+            bet = 0;
+            Globals.table = 0;
+            hand.RemoveAll(item => item is Card);
+            Console.WriteLine($"You win! your bank: {bank}");
+        }
+        public override void Loose()
+        {
+            bet = 0;
+            hand.RemoveAll(item => item is Card);
+            Console.WriteLine($"You loose! your bank: {bank}");
         }
 
     }
@@ -70,6 +97,13 @@ namespace BlackJack_cSharp
             return this.name;
         }
      }
+    public static class Globals
+    {
+        public static List<Card> deck;
+        public static Random random;
+        public static int table;
+        public static Player player;
+    }
     public class Program
     {
         public static List<Card> GenerateDeck()
@@ -88,7 +122,29 @@ namespace BlackJack_cSharp
         }
         public static void Main(string[] args)
         {   
-            var deck = GenerateDeck();
+            Globals.deck = GenerateDeck();
+            Globals.random = new Random();
+            Globals.player = new Player();
+            while (true)
+            {
+                var i = Console.ReadLine();
+                switch (i)
+                {
+                    case "1":
+                        Console.WriteLine("insert your bet: ");
+                        Globals.player.Bet = Convert.ToInt32(Console.ReadLine());
+                        continue;
+                    case "2":
+                        Globals.player.TakeCard();
+                        continue;
+                    case "3":
+                        Globals.player.Win();
+                        continue;
+                    case "4":
+                        Globals.player.Loose();
+                        continue;
+                }
+            }
         }
     }
 }
