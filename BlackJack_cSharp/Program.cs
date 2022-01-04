@@ -49,9 +49,9 @@ namespace BlackJack_cSharp
             var cardAt = Globals.random.Next(Globals.deck.Count);
             var card = Globals.deck[cardAt];
             hand.Add(card);
-            CountSum(card);
             Globals.deck.RemoveAt(cardAt);
             Console.WriteLine($"{name} took a card: {card} ");
+            CountSum(card);
         }
         public override void Win()
         {
@@ -59,6 +59,7 @@ namespace BlackJack_cSharp
             bet = 0;
             Globals.table = 0;
             hand.RemoveAll(item => item is Card);
+            sum = new List<int> { 0, 0 };
             Console.WriteLine($"{name} win!");
         }
         public override void Loose()
@@ -69,17 +70,63 @@ namespace BlackJack_cSharp
         }
         public void CountSum(Card card)
         {
-            sum[0] += card.rank;
-            if ((card.rank == 1) && (sum[0] + 11 < 21)) 
-            { 
+            Predicate<Card> predicate = x => x.rank == 1;
+            var handAr = hand.ToArray();
+            if (hand.Contains(Array.Find(handAr, predicate)) && (sum[1] + 11 < 21))
+            {
+                sum[0] += 1;
                 sum[1] += 11;
                 Console.WriteLine($"sum of {name}: {sum[0]} or {sum[1]}");
-            }
-            else 
-            { 
+            } 
+            else
+            {
+                sum[0] += card.rank;
                 sum[1] += card.rank;
-                Console.WriteLine($"sum of {name}: {sum[0]}");
+                if (hand.Count() == 2 && sum[1] <= 21)
+                {
+                    Console.WriteLine($"sum of {name}: {sum[1]}");
+                }
+                else
+                {
+                    Console.WriteLine($"sum of {name}: {sum[0]}");
+                }
             }
+        }
+        
+        public int PlayerStep()
+        {
+            Console.WriteLine("insert your bet:");
+            Bet = Convert.ToInt32(Console.ReadLine());
+            TakeCard();
+            TakeCard();
+            if (sum[1] == 21)
+            {
+                Console.WriteLine("BlackJack!");
+                return sum[1];
+            }
+            string status;
+            while (sum[0] < 21 || sum[1] < 21)
+            {
+                Console.WriteLine("Take another card? y/n");
+                status = Console.ReadLine();
+                if (status == "y")
+                {
+                    TakeCard();
+                }
+                else if (status == "n") 
+                {
+                    break;
+                }
+                else 
+                { 
+                    Console.WriteLine("invalid data"); 
+                    continue; 
+                }
+            }
+            var query = from i in sum
+                        where i == 21 || i < 21 || i > 21 && i == sum.Min()
+                        select i;
+            return query.ElementAt(0);
         }
     }
     public class Dealer : Player
@@ -91,7 +138,7 @@ namespace BlackJack_cSharp
 
         public Dealer()
         {
-            name = "Dealer";
+            this.name = "Dealer";
         }
 
     }
@@ -153,12 +200,10 @@ namespace BlackJack_cSharp
             Globals.deck = GenerateDeck();
             Globals.random = new Random();
             var player = new Player();
-            int i = 0;
-            while (Globals.deck.Count != 0)
-            {
-                player.TakeCard();
-                i++;
-                Console.WriteLine(i);
+            while (true) 
+            { 
+                player.PlayerStep();
+                player.Win();
             }
         }
     }
