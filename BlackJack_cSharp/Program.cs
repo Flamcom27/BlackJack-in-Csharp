@@ -18,6 +18,7 @@ namespace BlackJack_cSharp
         public int bank;
         private int bet;
         private List<int> sum;
+        public int res;
         public Player()
         {
             Console.WriteLine("insert your name");
@@ -40,7 +41,8 @@ namespace BlackJack_cSharp
                 }
                 bet = value;
                 bank -= bet;
-                Globals.table += bet;
+                Globals.Table += bet * 2;
+                Console.WriteLine($"{name} your bank: {bank}$, your bet {Bet}$");
             }
         }
         public List<int> Sum {  get { return sum; } set { sum = value; } }
@@ -55,27 +57,46 @@ namespace BlackJack_cSharp
         }
         public override void Win()
         {
-            bank += Globals.table;
+            Console.WriteLine($"{name} wins {Globals.Table}!");
+            bank += Globals.Table;
             bet = 0;
-            Globals.table = 0;
+            Globals.Table = 0;
             hand.RemoveAll(item => item is Card);
             sum = new List<int> { 0, 0 };
-            Console.WriteLine($"{name} win!");
         }
         public override void Loose()
         {
+            Console.WriteLine($"{name} looses {Bet}!");
             bet = 0;
+            Globals.Table = 0;
             hand.RemoveAll(item => item is Card);
-            Console.WriteLine($"{name} loose!");
+            sum = new List<int> { 0, 0 };
+        }
+        public void Draw()
+        {
+            Console.WriteLine($"Draw!");
+            bank += Globals.Table / 2;
+            bet = 0;
+            Globals.Table = 0;
+            hand.RemoveAll(item => item is Card);
+            sum = new List<int> { 0, 0 };
+
+        }
+        public void DealerRes()
+        {
+            hand.RemoveAll(item => item is Card);
+            sum = new List<int> { 0, 0 };
         }
         public void CountSum(Card card)
         {
-            Predicate<Card> predicate = x => x.rank == 1;
+            Predicate <Card> predicate = x => x.rank == 1;
             var handAr = hand.ToArray();
-            if (hand.Contains(Array.Find(handAr, predicate)) && (sum[1] + 11 < 21))
+            bool hasAce = hand.Contains(Array.Find(handAr, predicate));
+            if (hasAce && sum[1] + 11 <= 21 || hasAce && sum[1] + card.rank <= 21)
             {
-                sum[0] += 1;
-                sum[1] += 11;
+                sum[0] += card.rank;
+                if (card.rank == 1 && sum[1] + 11 <= 21) { sum[1] += 11; }
+                else { sum[1] += card.rank; }
                 Console.WriteLine($"sum of {name}: {sum[0]} or {sum[1]}");
             } 
             else
@@ -93,7 +114,7 @@ namespace BlackJack_cSharp
             }
         }
         
-        public int PlayerStep()
+        public void PlayerStep()
         {
             Console.WriteLine("insert your bet:");
             Bet = Convert.ToInt32(Console.ReadLine());
@@ -102,10 +123,9 @@ namespace BlackJack_cSharp
             if (sum[1] == 21)
             {
                 Console.WriteLine("BlackJack!");
-                return sum[1];
             }
             string status;
-            while (sum[0] < 21 || sum[1] < 21)
+            while (sum[0] < 21 && sum[1] < 21)
             {
                 Console.WriteLine("Take another card? y/n");
                 status = Console.ReadLine();
@@ -124,23 +144,27 @@ namespace BlackJack_cSharp
                 }
             }
             var query = from i in sum
-                        where i == 21 || i < 21 || i > 21 && i == sum.Min()
+                        where i == 21 || i < 21 && i == sum.Max() || i > 21 && i == sum.Min()
                         select i;
-            return query.ElementAt(0);
+            res = query.ElementAt(0);
         }
-    }
-    public class Dealer : Player
-    {
-        public List<Card> hand = new List<Card>();
-        public string name;
-        public double bank = double.PositiveInfinity;
-        private int bet;
-
-        public Dealer()
+        public void DealerStep()
         {
-            this.name = "Dealer";
+            TakeCard();
+            TakeCard();
+            if (sum[1] == 21)
+            {
+                Console.WriteLine("BlackJack!");
+            }
+            while (sum[1] < 17 && sum[0] < 17) 
+            { 
+                TakeCard();
+            }
+            var query = from i in sum
+                    where i == 21 || i < 21 || i > 21 && i == sum.Min()
+                    select i;
+            res = query.ElementAt(0);
         }
-
     }
     public class Card
     {
@@ -160,19 +184,29 @@ namespace BlackJack_cSharp
         }
         public dynamic Name
         {
-            get { return this.name; }
-            set { this.name = $"{value} of {this.suit}"; }
+            get { return name; }
+            set { name = $"{value} of {suit}"; }
         }
         public override string ToString()
         {
-            return this.name;
+            return name;
         }
      }
     public static class Globals
     {
         public static List<Card> deck;
+        public static List<Card> deckCopy;
         public static Random random;
-        public static int table;
+        private static int table = 0;
+        public static int Table
+        {
+            get { return table; }
+            set 
+            { 
+                table = value;
+                Console.WriteLine($"{value} on table");
+            }
+        }
     }
     public class Program
     {
@@ -190,20 +224,49 @@ namespace BlackJack_cSharp
             }
             return deck;
         }
-        public static void Compare(Player player, Dealer dealer)
+        public static void Compare(Player player, Player dealer)
         {
-            
-
+            var pr = player.res;
+            var dr = dealer.res;
+            if (pr == dr)
+            {
+                player.Draw();
+                dealer.DealerRes();
+            }
+            else if ((pr > dr && pr <= 21) || (pr < dr && dr > 21))
+            {
+                player.Win();
+                dealer.DealerRes();
+            }
+            else if ((dr > pr && dr <= 21) || (dr < pr && pr > 21))
+            {
+                player.Loose();
+                dealer.DealerRes();
+            }
         }
         public static void Main(string[] args)
-        {   
-            Globals.deck = GenerateDeck();
+        {
+            Globals.deck = new List<Card>();
+            for (int i = 0; i < 4; i++)
+            {
+                var deck = GenerateDeck();
+                Globals.deck.AddRange(deck);
+            }
+            Globals.deckCopy = Globals.deck;
             Globals.random = new Random();
             var player = new Player();
-            while (true) 
-            { 
+            var dealer = new Player();
+            var index = true;
+            while (index)
+            {
                 player.PlayerStep();
-                player.Win();
+                dealer.DealerStep();
+                Compare(player, dealer);
+                Globals.deck = Globals.deckCopy;
+                Console.WriteLine("Continue ? y/n");
+                if (Console.ReadLine() == "n") { break; }
+                else { continue; }
+
             }
         }
     }
