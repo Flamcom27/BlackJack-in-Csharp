@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace BlackJack_cSharp 
 {
@@ -19,10 +20,9 @@ namespace BlackJack_cSharp
         private int bet;
         private List<int> sum;
         public int res;
-        public Player()
+        public Player(string name)
         {
-            Console.WriteLine("insert your name");
-            name = Console.ReadLine();
+            this.name = name;
             bank = 1000;
             sum = new List<int> { 0, 0 };
         }
@@ -53,6 +53,7 @@ namespace BlackJack_cSharp
             hand.Add(card);
             Globals.deck.RemoveAt(cardAt);
             Console.WriteLine($"{name} took a card: {card} ");
+            Thread.Sleep(1500);
             CountSum(card);
         }
         public override void Win()
@@ -92,28 +93,28 @@ namespace BlackJack_cSharp
             Predicate <Card> predicate = x => x.rank == 1;
             var handAr = hand.ToArray();
             bool hasAce = hand.Contains(Array.Find(handAr, predicate));
-            if (hasAce && sum[1] + 11 <= 21 || hasAce && sum[1] + card.rank <= 21)
+            sum[0] += card.rank;
+            if (card.rank == 1 && sum[1] + 11 <= 21) 
+            { 
+                sum[1] += 11; 
+            }
+            else 
+            { 
+                sum[1] += card.rank; 
+            }
+            if (sum[1] == 21)
             {
-                sum[0] += card.rank;
-                if (card.rank == 1 && sum[1] + 11 <= 21) { sum[1] += 11; }
-                else { sum[1] += card.rank; }
-                Console.WriteLine($"sum of {name}: {sum[0]} or {sum[1]}");
-            } 
-            else
-            {
-                sum[0] += card.rank;
-                sum[1] += card.rank;
-                if (hand.Count() == 2 && sum[1] <= 21)
-                {
-                    Console.WriteLine($"sum of {name}: {sum[1]}");
-                }
-                else
-                {
-                    Console.WriteLine($"sum of {name}: {sum[0]}");
-                }
+                Console.WriteLine($"sum of {name}: {sum[1]}");
+            }
+            else if (sum[1] <= 21 && sum[0] != sum[1]) 
+            { 
+                Console.WriteLine($"sum of {name}: {sum[0]} or {sum[1]}"); 
+            }
+            else 
+            { 
+                Console.WriteLine($"sum of {name}: {sum[0]}"); 
             }
         }
-        
         public void PlayerStep()
         {
             Console.WriteLine("insert your bet:");
@@ -125,7 +126,7 @@ namespace BlackJack_cSharp
                 Console.WriteLine("BlackJack!");
             }
             string status;
-            while (sum[0] < 21 && sum[1] < 21)
+            while (sum[0] < 21 && (sum[1] < 21 || sum[1] > 21))
             {
                 Console.WriteLine("Take another card? y/n");
                 status = Console.ReadLine();
@@ -144,7 +145,7 @@ namespace BlackJack_cSharp
                 }
             }
             var query = from i in sum
-                        where i == 21 || i < 21 && i == sum.Max() || i > 21 && i == sum.Min()
+                        where (i == 21) || ((i == sum.Max() && sum[0] < 21 && sum[1] < 21)) || (i == sum.Min() && sum[1] > 21)
                         select i;
             res = query.ElementAt(0);
         }
@@ -156,13 +157,13 @@ namespace BlackJack_cSharp
             {
                 Console.WriteLine("BlackJack!");
             }
-            while (sum[1] < 17 && sum[0] < 17) 
+            while (sum[1] < 17 && sum[0] < 17 || sum[0] < 17 && sum[1] > 21) 
             { 
                 TakeCard();
             }
             var query = from i in sum
-                    where i == 21 || i < 21 || i > 21 && i == sum.Min()
-                    select i;
+                        where (i == 21) || ((i == sum.Max() && sum[0] < 21 && sum[1] < 21)) || (i == sum.Min() && sum[1] > 21)
+                        select i;
             res = query.ElementAt(0);
         }
     }
@@ -204,7 +205,7 @@ namespace BlackJack_cSharp
             set 
             { 
                 table = value;
-                Console.WriteLine($"{value} on table");
+                Console.WriteLine($"{value} is on table");
             }
         }
     }
@@ -228,6 +229,7 @@ namespace BlackJack_cSharp
         {
             var pr = player.res;
             var dr = dealer.res;
+            Console.WriteLine($"{player.name} result: {pr}, Dealer result: {dr}");
             if (pr == dr)
             {
                 player.Draw();
@@ -254,8 +256,9 @@ namespace BlackJack_cSharp
             }
             Globals.deckCopy = Globals.deck;
             Globals.random = new Random();
-            var player = new Player();
-            var dealer = new Player();
+            Console.WriteLine("insert your name");
+            var player = new Player(Console.ReadLine());
+            var dealer = new Player("Dealer");
             var index = true;
             while (index)
             {
